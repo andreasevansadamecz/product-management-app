@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "repo for our labs",
   "main": "index.js",
-  "type":"module",
+  "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -16,5 +16,9 @@
   "bugs": {
     "url": "https://github.com/andreasevansdurhamcollege/inft-2202-lab/issues"
   },
-  "homepage": "https://github.com/andreasevansdurhamcollege/inft-2202-lab#readme"
+  "homepage": "https://github.com/andreasevansdurhamcollege/inft-2202-lab#readme",
+  "dependencies": {
+    "@fortawesome/fontawesome-free": "^6.7.2",
+    "bootstrap": "^5.3.3"
+  }
 }
