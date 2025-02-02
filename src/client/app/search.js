@@ -118,8 +118,9 @@ function drawProductCards(products) {
     for (const product of products) {
         const card = document.createElement("div");
         card.classList.add("card", "mb-4", "shadow-sm");
+
         const img = document.createElement("img");
-        img.src = `https://source.unsplash.com/random/300x200?sig=${product.id}`;
+        img.src = "img/carrot.png";
         img.classList.add("card-img-top");
         img.alt = `Image of ${product.name}`;
         
@@ -145,13 +146,13 @@ function drawProductCards(products) {
         const buttonGroup = document.createElement("div");
         buttonGroup.classList.add("btn-group");
 
-        // 🛒 Add to Cart Button (Does nothing for now)
+        // Add to Cart Button (Does nothing for now)
         const addToCartBtn = document.createElement("button");
         addToCartBtn.classList.add("btn", "btn-success");
         addToCartBtn.textContent = "Add to Cart";
         addToCartBtn.disabled = true;
 
-        // 🗑️ Delete Button
+        // Delete Button
         const deleteBtn = document.createElement("button");
         deleteBtn.classList.add("btn", "btn-danger");
         deleteBtn.setAttribute("data-bs-toggle", "tooltip");
@@ -159,7 +160,7 @@ function drawProductCards(products) {
         deleteBtn.innerHTML = `<i class="fa-solid fa-trash"></i>`;
         deleteBtn.addEventListener("click", onDeleteClick(product));
 
-        // ✏️ Edit Button
+        // Edit Button
         const editLink = document.createElement("a");
         editLink.classList.add("btn", "btn-primary");
         editLink.href = `create.html?id=${product.id}`;
@@ -174,7 +175,7 @@ function drawProductCards(products) {
     }
 }
 
-// 🗑️ Handle Product Deletion
+// Handle Product Deletion
 function onConfirm(product) {
     console.log("Confirmed delete:", product);
 

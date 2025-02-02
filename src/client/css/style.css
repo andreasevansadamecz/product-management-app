@@ -1,0 +1,140 @@
+/* 
+Name: Andreas Evans-Adamecz 
+Filename: style.css 
+Course: INFT 2202 
+Date: January 14, 2025 
+Description: Main CSS stylesheet for The Silk Road 
+*/
+
+:root {
+    --primary-color: #6c757d;
+    --secondary-color: #343a40;
+    --accent-color: #ffc107; 
+    --text-color: #ffffff; 
+    --bg-light: #f8f9fa; 
+    --card-bg: #212529; 
+    --border-radius: 10px;
+}
+
+/* General Styling */
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: var(--secondary-color);
+    color: var(--text-color);
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Navbar Styling */
+.navbar {
+    background-color: var(--primary-color);
+    padding: 10px 20px;
+}
+
+.navbar-brand {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--accent-color);
+}
+
+.navbar-nav .nav-link {
+    color: black !important;
+    font-weight: 500;
+    transition: all 0.3s ease-in-out;
+}
+
+.navbar-nav .nav-link:hover, .navbar-nav .nav-link.active {
+    color: var(--accent-color);
+    transform: scale(1.1);
+}
+
+/* Home Page (Index) */
+main {
+    flex: 1;
+    padding: 40px 0;
+    text-align: center;
+}
+
+/* Carousel */
+.carousel-item img {
+    height: 500px;
+    object-fit: cover;
+    border-radius: var(--border-radius);
+}
+
+/* Product Cards */
+.card {
+    background-color: var(--card-bg);
+    color: var(--text-color);
+    border-radius: var(--border-radius);
+    border: none;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease-in-out;
+}
+
+.card:hover {
+    transform: scale(1.05);
+}
+
+.card img {
+    border-radius: var(--border-radius) var(--border-radius) 0 0;
+}
+
+.card-img-top {
+    width: 25px;
+    height: 50px;
+    object-fit: contain;
+    margin: auto;
+    display: block;
+}
+
+/* Forms */
+form {
+    background: var(--card-bg);
+    padding: 20px;
+    border-radius: var(--border-radius);
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.form-control {
+    border-radius: var(--border-radius);
+}
+
+.form-control:focus {
+    border-color: var(--accent-color);
+    box-shadow: 0px 0px 5px var(--accent-color);
+}
+
+/* Buttons */
+.btn-primary {
+    background-color: var(--accent-color);
+    border-color: var(--accent-color);
+    font-weight: bold;
+}
+
+.btn-primary:hover {
+    background-color: #ffca2c;
+    border-color: #ffca2c;
+}
+
+/* Footer */
+footer {
+    background-color: var(--primary-color);
+    color: var(--text-color);
+    padding: 15px;
+    text-align: center;
+    margin-top: auto;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .navbar-nav {
+        text-align: center;
+    }
+    .carousel-item img {
+        height: 300px;
+    }
+}
