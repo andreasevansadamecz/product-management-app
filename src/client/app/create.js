@@ -42,7 +42,7 @@ function setupEditForm() {
         productForm.description.value = existingProduct.description;
     } catch (error) {
         console.error("Product not found:", error.message);
-        window.location.href = "list.html";
+        window.location.href = "search.html";
     }
 }
 

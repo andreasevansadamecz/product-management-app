@@ -22,6 +22,8 @@ const perPage = parseInt(searchParams.get("perPage") ?? 5);
 console.log("Current Page:", page, "Items per page:", perPage);
 
 const products = productService.listProducts(page, perPage);
+console.log("Products Retrieved:", products);
+
 toggleProductVisibility(products);
 
 function drawPaginationLinks(elePaginationContainer, currentPage, totalPages) {
