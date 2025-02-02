@@ -29,14 +29,16 @@ function setupEditForm() {
     const eleHeading = document.querySelector("h1");
     eleHeading.textContent = "Edit Existing Product";
 
+    console.log("Edit mode: Trying to load product with ID:", editId);
+
     try {
         const existingProduct = productService.findProduct(editId);
         console.log("Editing product:", existingProduct);
 
         const productForm = document.getElementById("product-form");
 
-        productForm.name.value = existingProduct.name;
-        productForm.name.disabled = true;
+        productForm.productName.value = existingProduct.name;
+        productForm.productName.disabled = true;
         productForm.price.value = existingProduct.price;
         productForm.stock.value = existingProduct.stock;
         productForm.description.value = existingProduct.description;

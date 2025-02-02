@@ -65,6 +65,18 @@ main {
     border-radius: var(--border-radius);
 }
 
+/* About Me */
+.profile-img {
+    display: block;
+    margin: 20px auto; /* Centers the image */
+    width: 300px; /* Adjust size */
+    height: 300px; /* Ensure it's square */
+    object-fit: cover; /* Crop to fit */
+    border-radius: 50%; /* Makes it circular */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Adds a subtle shadow */
+}
+
+
 /* Product Cards */
 .card {
     background-color: var(--card-bg);
