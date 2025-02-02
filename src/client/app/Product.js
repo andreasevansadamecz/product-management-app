@@ -6,25 +6,22 @@ Date: January 14, 2025
 Description: Product class file
 */
 
-export default class Product {
-    constructor({id = null, name, price, stock, description, imageURL}) {
-        this.id = id ?? crupto.randomUUID();
+export default function Product({id = null, name, price, stock, description}) {
+    this.id = id ?? crypto.randomUUID();
 
-        Object.assign(this, {name, price, stock, description, imageURL})
-    }
+    Object.assign(this, {name, price, stock, description});
+}
 
-    toString() {
-        return `${this.name} costs $${this.price.toFixed(2)}, has ${this.stock} in stock, and is described as: "${this.description}".`; 
-    }
+Product.prototype.toString = function() {
+    return `${this.name} - $${this.price} (${this.stock} in stock)`;
+};
 
-    toJSON() {
-        return {
-            id: this.id,
-            name: this.name,
-            price: this.price,
-            stock: this.stock,
-            description: this.description,
-            imageURL: this.imageURL
-        };
-    }
+Product.prototype.toJSON = function () {
+    return {
+        id: this.id,
+        name: this.name,
+        price: this.price,
+        stock: this.stock,
+        description: this.description
+    };
 }
