@@ -41,7 +41,7 @@ body {
 }
 
 .navbar-nav .nav-link {
-    color: black !important;
+    color: var(--card-bg);
     font-weight: 500;
     transition: all 0.3s ease-in-out;
 }

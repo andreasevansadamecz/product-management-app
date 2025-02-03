@@ -9,12 +9,21 @@ Description: Mock service file for managing product data
 import Product from "./Product.js";
 
 export default class ProductService {
+    /**
+     * initializes localStorage with an empty product array if its not already set
+     */
     constructor() {
         if (!localStorage.getItem("products")) {
             localStorage.setItem("products", JSON.stringify([]));
         }
     }
 
+    /**
+     * retrieves a paginated list of products
+     * @param {number} page 
+     * @param {number} perPage 
+     * @returns {Array}
+     */
     listProducts(page = 1, perPage = 5) {
         const first = (page - 1) * perPage;
         const last = first + perPage;
@@ -22,15 +31,28 @@ export default class ProductService {
         return this.getAllProducts().slice(first, last);
     }
 
+    /**
+     * retrieves all products from localStorage and converts them to Product objects
+     * @returns {Array}
+     */
     getAllProducts() {
         return JSON.parse(localStorage.getItem("products"))
             .map(product => new Product(product));
     }
 
+    /**
+     * returns the total numba of products in localStorage
+     * @returns {number}
+     */
     listProductCount() {
         return this.getAllProducts().length;
     }
 
+    /**
+     * creates a new product and stores it
+     * @param {Product} productObject 
+     * @returns {boolean}
+     */
     createProduct(productObject) {
         const products = this.getAllProducts();
         if (products.find(product => product.name === productObject.name)) {
@@ -41,6 +63,11 @@ export default class ProductService {
         return true;
     }
 
+    /**
+     * deletes products
+     * @param {string} productId 
+     * @returns {boolean}
+     */
     deleteProduct(productId) {
         let products = this.getAllProducts();
         const index = products.findIndex(p => p.id === productId);
@@ -54,6 +81,11 @@ export default class ProductService {
         return true;
     }
 
+    /**
+     * updates existing products
+     * @param {Product} updatedProduct 
+     * @returns {boolean}
+     */
     updateProduct(updatedProduct) {
         let products = this.getAllProducts();
         const index = products.findIndex(p => p.id === updatedProduct.id);
@@ -68,6 +100,11 @@ export default class ProductService {
         return true;
     }
 
+    /**
+     * finds products by their ids
+     * @param {string} productId 
+     * @returns {Product}
+     */
     findProduct(productId) {
         const product = this.getAllProducts().find(p => p.id === productId);
         if (!product) {

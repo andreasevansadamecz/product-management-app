@@ -26,16 +26,24 @@ console.log("Products Retrieved:", products);
 
 toggleProductVisibility(products);
 
+/**
+ * makes the pagination links
+ * @param {HTMLElement} elePaginationContainer 
+ * @param {number} currentPage 
+ * @param {number} totalPages 
+ */
 function drawPaginationLinks(elePaginationContainer, currentPage, totalPages) {
     const elePaginationItems = elePaginationContainer.querySelector("ul.pagination");
-    elePaginationItems.replaceChildren();
+    elePaginationItems.replaceChildren(); // clears existing links
 
+    // only show pages if there are multiple
     if (totalPages > 1) {
         elePaginationContainer.classList.remove("d-none");
     } else {
         elePaginationContainer.classList.add("d-none");
     }
 
+    // previous page
     const elePrevItem = document.createElement("li");
     elePrevItem.classList.add("page-item");
     const elePrevLink = document.createElement("a");
@@ -53,6 +61,7 @@ function drawPaginationLinks(elePaginationContainer, currentPage, totalPages) {
     elePrevItem.append(elePrevLink);
     elePaginationItems.append(elePrevItem);
 
+    // page numbers
     for (let i = 1; i <= totalPages; i++) {
         const elePageItem = document.createElement("li");
         elePageItem.classList.add("page-item");
@@ -73,12 +82,17 @@ function drawPaginationLinks(elePaginationContainer, currentPage, totalPages) {
         elePaginationItems.append(elePageItem);
     }
 
+    /**
+     * takes you to the specified page
+     * @param {number} pageNumber 
+     */
     function navigateToPage(pageNumber) {
         const url = new URL(window.location);
         url.searchParams.set("page", pageNumber);
         window.location.href = url.toString();
     }
 
+    // next page
     const eleNextItem = document.createElement("li");
     eleNextItem.classList.add("page-item");
     const eleNextLink = document.createElement("a");
@@ -98,6 +112,10 @@ function drawPaginationLinks(elePaginationContainer, currentPage, totalPages) {
     elePaginationItems.append(eleNextItem);
 }
 
+/**
+ * toggles visibility based on whether or not there are any products
+ * @param {Array} products 
+ */
 function toggleProductVisibility(products) {
     if (!products.length) {
         eleMessageBox.classList.remove("d-none");
@@ -112,6 +130,10 @@ function toggleProductVisibility(products) {
     }
 }
 
+/**
+ * makes and displays the product cards
+ * @param {Array} products 
+ */
 function drawProductCards(products) {
     eleContainer.replaceChildren();
 
@@ -119,30 +141,37 @@ function drawProductCards(products) {
         const card = document.createElement("div");
         card.classList.add("card", "mb-4", "shadow-sm");
 
+        // Product Image
         const img = document.createElement("img");
         img.src = "img/carrot.png";
         img.classList.add("card-img-top");
         img.alt = `Image of ${product.name}`;
         
+        // Card Body
         const cardBody = document.createElement("div");
         cardBody.classList.add("card-body");
 
+        //Product title
         const cardTitle = document.createElement("h5");
         cardTitle.classList.add("card-title");
         cardTitle.textContent = product.name;
 
+        // product description
         const cardText = document.createElement("p");
         cardText.classList.add("card-text");
         cardText.textContent = product.description;
 
+        // product price
         const cardPrice = document.createElement("p");
         cardPrice.classList.add("card-text", "fw-bold");
         cardPrice.textContent = `Price: $${product.price}`;
 
+        // product stock
         const cardStock = document.createElement("p");
         cardStock.classList.add("card-text");
         cardStock.textContent = `Stock: ${product.stock}`;
 
+        // button group
         const buttonGroup = document.createElement("div");
         buttonGroup.classList.add("btn-group");
 
@@ -168,6 +197,7 @@ function drawProductCards(products) {
         editLink.setAttribute("title", "Edit Product");
         editLink.innerHTML = `<i class="fa-solid fa-edit"></i>`;
 
+        // appends buttons to the button group
         buttonGroup.append(addToCartBtn, editLink, deleteBtn);
         cardBody.append(cardTitle, cardText, cardPrice, cardStock, buttonGroup);
         card.append(img, cardBody);
@@ -191,17 +221,33 @@ function onConfirm(product) {
     modal.hide();
 }
 
+/**
+ * handles the delete modal
+ * @param {Object} product 
+ * @returns {Function}
+ */
 function onShow(product) {
     return () => {
         console.log("Modal shown for:", product);
 
+        const modalBody = document.querySelector("#deleteModal .modal-body");
         const deleteButton = document.querySelector("#deleteModal .btn-danger");
+
+        if (modalBody) {
+            modalBody.textContent = "Are you sure you want to delete this product?"
+        }
+        
         deleteButton.replaceWith(deleteButton.cloneNode(true));
 
         document.querySelector("#deleteModal .btn-danger").addEventListener("click", () => onConfirm(product));
     };
 }
 
+/**
+ * handles the delete button click event
+ * @param {Object} product 
+ * @returns {Function}
+ */
 function onDeleteClick(product) {
     return () => {
         console.log(`Trying to delete product ${product.id}`);

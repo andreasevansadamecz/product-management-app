@@ -11,11 +11,13 @@ import ProductService from "./product.mock.service.js";
 
 const productService = new ProductService();
 
+// Get URL parameters to determine if we are in edit mode
 const url = new URL(window.location);
 const searchParams = url.searchParams;
 const editId = searchParams.get("id");
 const isEditMode = editId ? true : false;
 
+// Load the right form mode
 if (isEditMode) {
     console.log(`Edit page loaded for product ID: ${editId}`);
     setupEditForm();
@@ -23,8 +25,12 @@ if (isEditMode) {
     console.log("Create page loaded!");
 }
 
+// Add event listenr to the product form
 document.getElementById("product-form").addEventListener("submit", submitProductForm);
 
+/**
+ * Sets up the form in edit mode
+ */
 function setupEditForm() {
     const eleHeading = document.querySelector("h1");
     eleHeading.textContent = "Edit Existing Product";
@@ -32,9 +38,11 @@ function setupEditForm() {
     console.log("Edit mode: Trying to load product with ID:", editId);
 
     try {
+        // Retrieve product details from ProductService
         const existingProduct = productService.findProduct(editId);
         console.log("Editing product:", existingProduct);
 
+        // Populate form fields with product data
         const productForm = document.getElementById("product-form");
 
         productForm.productName.value = existingProduct.name;
@@ -44,21 +52,27 @@ function setupEditForm() {
         productForm.description.value = existingProduct.description;
     } catch (error) {
         console.error("Product not found:", error.message);
-        window.location.href = "search.html";
+        window.location.href = "search.html"; // If the product ID is invalid redirect to search page
     }
 }
 
+/**
+ * Handles the form submission for creating or updating a product 
+ */
 function submitProductForm(event) {
     event.preventDefault();
     const productForm = event.target;
     const eleMessageBox = document.getElementById("message-box");
+
+    // validate form input
     const isValid = validateProductForm(productForm);
 
     console.log("Form data:", productForm);
 
     if (isValid) {
+        // create a product object using form input
         const productParams = {
-            id: editId,
+            id: editId, // if you're editing a product, keep the same ID
             name: productForm.productName.value.trim(),
             price: parseFloat(productForm.price.value).toFixed(2),
             stock: parseInt(productForm.stock.value),
@@ -87,9 +101,15 @@ function submitProductForm(event) {
     }
 }
 
+/**
+ * Validates inputs and writes error messages
+ * @param {HTMLFormElement} form 
+ * @returns {boolean}
+ */
 function validateProductForm(form) {
     let valid = true;
 
+    // validate product name
     const name = form.productName.value.trim();
     const eleNameError = form.productName.nextElementSibling;
     if (name === "") {
@@ -100,6 +120,7 @@ function validateProductForm(form) {
         eleNameError.classList.add("d-none");
     }
 
+    // validate price
     const price = form.price.value.trim();
     const elePriceError = form.price.nextElementSibling;
     if (price === "" || isNaN(price) || parseFloat(price) < 0) {
@@ -110,6 +131,7 @@ function validateProductForm(form) {
         elePriceError.classList.add("d-none");
     }
 
+    // validate stock
     const stock = form.stock.value.trim();
     const eleStockError = form.stock.nextElementSibling;
     if (stock === "" || isNaN(stock) || parseInt(stock) <0) {
@@ -120,18 +142,19 @@ function validateProductForm(form) {
         eleStockError.classList.add("d-none");
     }
 
+    // validate description
     const description = form.description.value.trim();
-const eleDescriptionError = form.description.nextElementSibling;
+    const eleDescriptionError = form.description.nextElementSibling;
 
-if (!eleDescriptionError) {
-    console.error("Error: Missing description error message element.");
-} else if (description === "") {
-    valid = false;
-    eleDescriptionError.classList.remove("d-none");
-    eleDescriptionError.textContent = "Description is required.";
-} else {
-    eleDescriptionError.classList.add("d-none");
-}
+    if (!eleDescriptionError) {
+        console.error("Error: Missing description error message element.");
+    } else if (description === "") {
+        valid = false;
+        eleDescriptionError.classList.remove("d-none");
+        eleDescriptionError.textContent = "Description is required.";
+    } else {
+        eleDescriptionError.classList.add("d-none");
+    }
 
 return valid;
 
