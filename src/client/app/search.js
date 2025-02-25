@@ -7,7 +7,7 @@ Description: general application file
 */
 
 import Product from "./Product.js";
-import ProductService from "./product.mock.service.js";
+import ProductService from "./product.service.js";
 
 const productService = new ProductService();
 
@@ -21,10 +21,67 @@ const perPage = parseInt(searchParams.get("perPage") ?? 5);
 
 console.log("Current Page:", page, "Items per page:", perPage);
 
-const products = productService.listProducts(page, perPage);
-console.log("Products Retrieved:", products);
+async function loadProducts() {
+    try {
+        console.log("Fetching latest product list...");
 
-toggleProductVisibility(products);
+        const response = await productService.listProducts();
+
+        if (!response || !response.records) {
+            throw new Error("Invalid API response");
+        }
+
+        let { records: products } = response;
+
+        console.log("All Products Retrieved:", products);
+
+        // Use GitHub ID for filtering
+        const MY_GITHUB_ID = "andreasevansdurhamcollege";
+        products = products.filter(product => product.owner?.githubId === MY_GITHUB_ID);
+
+        console.log(`Filtered Products (Only Yours): ${products.length}`, products);
+
+        if (!products.length) {
+            console.warn("No products found for this GitHub ID. Check if your products exist.");
+            eleMessageBox.textContent = "No products found. Please add products to your shop.";
+            toggleProductVisibility([], 0);
+            return;
+        } else {
+            eleMessageBox.textContent = "";
+        }
+
+        // total pages based on filtered products
+        const totalPages = Math.max(1, Math.ceil(products.length / perPage)); // Ensure at least 1 page
+
+        // Apply manual pagination after filtering
+        const startIndex = (page - 1) * perPage;
+        const paginatedProducts = products.slice(startIndex, startIndex + perPage);
+
+        console.log(`Displaying products for Page ${page}:`, paginatedProducts);
+
+        toggleProductVisibility(paginatedProducts, totalPages);
+    } catch (error) {
+        console.error("Error loading products:", error.message);
+    }
+}
+
+
+// Load products correctly
+(async function () {
+    await loadProducts();
+})();
+
+
+/**
+ * Updates the URL to navigate to a specific page
+ * @param {number} pageNumber 
+ */
+function navigateToPage(pageNumber) {
+    const url = new URL(window.location);
+    url.searchParams.set("page", pageNumber);
+    window.location.href = url.toString();
+}
+
 
 /**
  * makes the pagination links
@@ -36,7 +93,7 @@ function drawPaginationLinks(elePaginationContainer, currentPage, totalPages) {
     const elePaginationItems = elePaginationContainer.querySelector("ul.pagination");
     elePaginationItems.replaceChildren(); // clears existing links
 
-    // only show pages if there are multiple
+    // Only show pagination when there are multiple pages
     if (totalPages > 1) {
         elePaginationContainer.classList.remove("d-none");
     } else {
@@ -49,7 +106,7 @@ function drawPaginationLinks(elePaginationContainer, currentPage, totalPages) {
     const elePrevLink = document.createElement("a");
     elePrevLink.textContent = "Previous";
     elePrevLink.classList.add("page-link");
-    elePrevLink.setAttribute("href", `search.html?page=${currentPage -1}`);
+    elePrevLink.setAttribute("href", `search.html?page=${currentPage - 1}`);
     if (currentPage === 1) {
         elePrevItem.classList.add("disabled");
     } else {
@@ -61,7 +118,7 @@ function drawPaginationLinks(elePaginationContainer, currentPage, totalPages) {
     elePrevItem.append(elePrevLink);
     elePaginationItems.append(elePrevItem);
 
-    // page numbers
+    // Only generate pagination for `totalPages`
     for (let i = 1; i <= totalPages; i++) {
         const elePageItem = document.createElement("li");
         elePageItem.classList.add("page-item");
@@ -80,16 +137,6 @@ function drawPaginationLinks(elePaginationContainer, currentPage, totalPages) {
 
         elePageItem.append(elePageLink);
         elePaginationItems.append(elePageItem);
-    }
-
-    /**
-     * takes you to the specified page
-     * @param {number} pageNumber 
-     */
-    function navigateToPage(pageNumber) {
-        const url = new URL(window.location);
-        url.searchParams.set("page", pageNumber);
-        window.location.href = url.toString();
     }
 
     // next page
@@ -112,23 +159,40 @@ function drawPaginationLinks(elePaginationContainer, currentPage, totalPages) {
     elePaginationItems.append(eleNextItem);
 }
 
+
+
 /**
  * toggles visibility based on whether or not there are any products
  * @param {Array} products 
  */
-function toggleProductVisibility(products) {
+function toggleProductVisibility(products, totalPages) {
     if (!products.length) {
         eleMessageBox.classList.remove("d-none");
         eleContainer.classList.add("d-none");
+
+        // Hide pagination if there are no products
+        document.getElementById("pagination").classList.add("d-none");
     } else {
         eleMessageBox.classList.add("d-none");
         eleContainer.classList.remove("d-none");
         drawProductCards(products);
+
         const elePaginationContainer = document.getElementById("pagination");
-        const totalPages = Math.ceil(productService.listProductCount() / perPage);
+
+        // Show pagination only if needed
+        if (totalPages > 1) {
+            elePaginationContainer.classList.remove("d-none");
+        } else {
+            elePaginationContainer.classList.add("d-none");
+        }
+
         drawPaginationLinks(elePaginationContainer, page, totalPages);
     }
 }
+
+
+
+
 
 /**
  * makes and displays the product cards
@@ -146,32 +210,32 @@ function drawProductCards(products) {
         img.src = "img/carrot.png";
         img.classList.add("card-img-top");
         img.alt = `Image of ${product.name}`;
-        
+
         // Card Body
         const cardBody = document.createElement("div");
         cardBody.classList.add("card-body");
 
-        //Product title
+        // Product title
         const cardTitle = document.createElement("h5");
         cardTitle.classList.add("card-title");
         cardTitle.textContent = product.name;
 
-        // product description
+        // Product description
         const cardText = document.createElement("p");
         cardText.classList.add("card-text");
         cardText.textContent = product.description;
 
-        // product price
+        // Product price
         const cardPrice = document.createElement("p");
         cardPrice.classList.add("card-text", "fw-bold");
         cardPrice.textContent = `Price: $${product.price}`;
 
-        // product stock
+        // Product stock
         const cardStock = document.createElement("p");
         cardStock.classList.add("card-text");
         cardStock.textContent = `Stock: ${product.stock}`;
 
-        // button group
+        // Button group
         const buttonGroup = document.createElement("div");
         buttonGroup.classList.add("btn-group");
 
@@ -187,17 +251,19 @@ function drawProductCards(products) {
         deleteBtn.setAttribute("data-bs-toggle", "tooltip");
         deleteBtn.setAttribute("title", "Delete Product");
         deleteBtn.innerHTML = `<i class="fa-solid fa-trash"></i>`;
-        deleteBtn.addEventListener("click", onDeleteClick(product));
+
+        // wrap in an anonymous function to avoid immediate execution
+        deleteBtn.addEventListener("click", () => onDeleteClick(product));
 
         // Edit Button
         const editLink = document.createElement("a");
         editLink.classList.add("btn", "btn-primary");
-        editLink.href = `create.html?id=${product.id}`;
+        editLink.href = `create.html?id=${product.productId}`;
         editLink.setAttribute("data-bs-toggle", "tooltip");
         editLink.setAttribute("title", "Edit Product");
         editLink.innerHTML = `<i class="fa-solid fa-edit"></i>`;
 
-        // appends buttons to the button group
+        // Append buttons to the button group
         buttonGroup.append(addToCartBtn, editLink, deleteBtn);
         cardBody.append(cardTitle, cardText, cardPrice, cardStock, buttonGroup);
         card.append(img, cardBody);
@@ -205,59 +271,120 @@ function drawProductCards(products) {
     }
 }
 
-// Handle Product Deletion
-function onConfirm(product) {
-    console.log("Confirmed delete:", product);
 
-    try {
-        productService.deleteProduct(product.id);
-        const updatedRecords = productService.listProducts(page, perPage);
-        toggleProductVisibility(updatedRecords);
-    } catch (error) {
-        console.error(error);
-    }
 
-    const modal = bootstrap.Modal.getInstance(document.getElementById("deleteModal"));
-    modal.hide();
-}
 
 /**
- * handles the delete modal
+ * Handles showing the delete modal with the correct product info.
  * @param {Object} product 
- * @returns {Function}
  */
 function onShow(product) {
-    return () => {
-        console.log("Modal shown for:", product);
+    if (!product || !product.productId) { //  Ensure product has a valid ID
+        console.error("❌ onShow() called with invalid product:", product);
+        return;
+    }
 
-        const modalBody = document.querySelector("#deleteModal .modal-body");
-        const deleteButton = document.querySelector("#deleteModal .btn-danger");
+    console.log("🗑️ Modal shown for:", product);
 
-        if (modalBody) {
-            modalBody.textContent = "Are you sure you want to delete this product?"
-        }
-        
-        deleteButton.replaceWith(deleteButton.cloneNode(true));
+    // select modal elements
+    const modalBody = document.querySelector("#deleteModal .modal-body");
 
-        document.querySelector("#deleteModal .btn-danger").addEventListener("click", () => onConfirm(product));
-    };
+    if (!modalBody) {
+        console.error("❌ Modal body not found in the DOM.");
+    } else {
+        modalBody.textContent = `Are you sure you want to delete "${product.name}"?`; // Ensure product name is set
+        console.log("✅ Modal body updated:", modalBody.textContent);
+    }
+
+    const deleteButton = document.querySelector("#confirmDeleteBtn");
+
+    if (modalBody) {
+        modalBody.textContent = `Are you sure you want to delete "${product.name}"?`; // Set modal text
+        console.log("✅ Modal body updated!"); //
+    } else {
+        console.error("❌ Modal body not found.");
+    }
+
+    if (deleteButton) {
+        // Remove previous event listeners before adding a new one
+        const newDeleteButton = deleteButton.cloneNode(true);
+        deleteButton.replaceWith(newDeleteButton);
+
+        newDeleteButton.addEventListener("click", () => onConfirm(product));
+        console.log("✅ Delete button event listener attached!");
+    } else {
+        console.error("❌ Delete button not found.");
+    }
 }
+
+
+
+
+
 
 /**
- * handles the delete button click event
+ * Handles clicking the delete button on a product.
  * @param {Object} product 
- * @returns {Function}
  */
 function onDeleteClick(product) {
-    return () => {
-        console.log(`Trying to delete product ${product.id}`);
+    console.log("🗑️ Delete button clicked. Product data:", product);
 
-        const eleModalWindow = document.getElementById("deleteModal");
-        const modal = new bootstrap.Modal(eleModalWindow);
-        eleModalWindow.removeEventListener("show.bs.modal", onShow);
-        eleModalWindow.addEventListener("show.bs.modal", onShow(product));
+    if (!product || !product.productId) {
+        console.error("❌ Invalid product data for deletion:", product);
+        return;
+    }
 
-        modal.show();
-    };
+    console.log(`🗑️ Trying to delete product ID: ${product.productId}`);
+
+    const eleModalWindow = document.getElementById("deleteModal");
+
+    if (!eleModalWindow) {
+        console.error("❌ Modal element not found.");
+        return;
+    }
+
+    const modal = bootstrap.Modal.getOrCreateInstance(eleModalWindow);
+
+    // Ensure the modal updates with the correct product before showing
+    onShow(product);
+
+    // Ensure modal only opens after it's properly updated
+    setTimeout(() => modal.show(), 100);
 }
+
+
+
+/**
+ * Handles product deletion.
+ * @param {Object} product 
+ */
+async function onConfirm(product) {
+    if (!product || !product.productId) { 
+        console.error("❌ Invalid product data for deletion. Product:", product);
+        return;
+    }
+
+    console.log("✅ Confirmed delete:", product);
+
+    try {
+        await productService.deleteProduct(product.productId); 
+        console.log(`✅ Successfully deleted product ${product.productId}`);
+
+        // Reload products after deletion
+        await loadProducts();
+    } catch (error) {
+        console.error("❌ Error deleting product:", error);
+    }
+
+    // Close the modal after deletion
+    const modalElement = document.getElementById("deleteModal");
+    const modalInstance = bootstrap.Modal.getInstance(modalElement);
+
+    if (modalInstance) {
+        modalInstance.hide();
+    } else {
+        console.error("❌ Bootstrap modal instance not found.");
+    }
+}
+
 

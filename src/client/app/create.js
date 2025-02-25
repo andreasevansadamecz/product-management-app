@@ -7,7 +7,7 @@ Description: general application file
 */
 
 import Product from "./Product.js";
-import ProductService from "./product.mock.service.js";
+import ProductService from "./product.service.js";
 
 const productService = new ProductService();
 
@@ -26,12 +26,37 @@ if (isEditMode) {
 }
 
 // Add event listenr to the product form
-document.getElementById("product-form").addEventListener("submit", submitProductForm);
+document.getElementById("product-form").addEventListener("submit", async function(event) {
+    event.preventDefault(); // Prevent default form submission
+    console.log("Form submission triggered!"); // Debugging log
+
+    const productForm = event.target;
+    const productData = {
+        name: productForm.productName.value.trim(),
+        price: parseFloat(productForm.price.value).toFixed(2),
+        stock: parseInt(productForm.stock.value),
+        description: productForm.description.value.trim(),
+    };
+
+    console.log("Sending data to API:", JSON.stringify(productData)); // Debugging log
+
+    try {
+        await productService.createProduct(productData);
+        console.log("Product successfully created!"); // Debugging log
+        console.log("Waiting 1 second before redirecting...");
+        setTimeout(() => {
+            window.location.href = "search.html?refresh=true";
+        }, 1000); // Redirect after creation
+    } catch (error) {
+        console.error("Error saving product:", error.message);
+    }
+});
+
 
 /**
  * Sets up the form in edit mode
  */
-function setupEditForm() {
+async function setupEditForm() {
     const eleHeading = document.querySelector("h1");
     eleHeading.textContent = "Edit Existing Product";
 
@@ -39,7 +64,7 @@ function setupEditForm() {
 
     try {
         // Retrieve product details from ProductService
-        const existingProduct = productService.findProduct(editId);
+        const existingProduct = await productService.findProduct(editId);
         console.log("Editing product:", existingProduct);
 
         // Populate form fields with product data
@@ -59,7 +84,7 @@ function setupEditForm() {
 /**
  * Handles the form submission for creating or updating a product 
  */
-function submitProductForm(event) {
+async function submitProductForm(event) {
     event.preventDefault();
     const productForm = event.target;
     const eleMessageBox = document.getElementById("message-box");
@@ -84,11 +109,11 @@ function submitProductForm(event) {
 
         try {
             if (isEditMode) {
-                productService.updateProduct(productObject);
+                await productService.updateProduct(editId, productParams);
             } else {
-                productService.createProduct(productObject);
+                await productService.createProduct(productParams);
             }
-            window.location.href = "search.html";
+            window.location.href = "search.html?refresh=true";
         } catch (error) {
             console.error("Error saving product:", error.message);
             eleMessageBox.classList.remove("d-none");

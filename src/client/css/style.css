@@ -132,6 +132,12 @@ form {
     border-color: #ffca2c;
 }
 
+.modal-body {
+    color: black !important;
+    font-size: 18px;
+}
+
+
 /* Footer */
 footer {
     background-color: var(--primary-color);
