@@ -4,7 +4,7 @@ import path from "path";
 import fs from "fs";
 
 // Create logs directory if it doesn't exist
-const logsDir = path.join("server", "logs");
+const logsDir = path.resolve("src/server/logs");
 if (!fs.existsSync(logsDir)) {
   fs.mkdirSync(logsDir);
 }

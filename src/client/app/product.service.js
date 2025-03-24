@@ -1,7 +1,6 @@
 export default class ProductService {
     constructor() {
-        this.host = "https://inft2202.opentech.durhamcollege.org/api/products";
-        this.apiKey = "8734df4f-4e33-430b-b81b-7b32c6d69e2c";
+        this.host = "http://localhost:3000/api/products";
     }
 
     /**
@@ -10,7 +9,6 @@ export default class ProductService {
     async request(endpoint, options = {}) {
         options.headers = {
             "Content-Type": "application/json",
-            "apikey": this.apiKey,
             ...options.headers,
         };
 
@@ -33,7 +31,6 @@ export default class ProductService {
         return this.request(`?${params.toString()}`, { 
             method: "GET",
             headers: {
-                "apikey": "8734df4f-4e33-430b-b81b-7b32c6d69e2c", // ✅ Add API Key in Authorization Header
                 "Content-Type": "application/json"
             }
         });
